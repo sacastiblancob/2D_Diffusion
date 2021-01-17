@@ -45,51 +45,57 @@ LFLAGS += $(MODFLAG) $(MODDIR)
 #
 # SOURCE FILES
 #
-SRCMAIN = $(SRCDIR)/home_ns.f
+SRCMAIN = $(SRCDIR)/home_diff.f
 SRCNUME = $(SRCDIR)/declarations_numerical.f
 SRCPHYS = $(SRCDIR)/declarations_physic.f
+SRCCSCS = $(SRCDIR)/csc_storage.f
+SRCDCSC = $(SRCDIR)/declarations_csc.f
 SRCWRHE = $(SRCDIR)/write_headers.f
-SRCPONS = $(SRCDIR)/point_ns.f
+SRCPONS = $(SRCDIR)/point_diff.f
+SRCALLC = $(SRCDIR)/all_csc.f
 SRCDIFF = $(SRCDIR)/diffusion_matrix.f
-SRCLAPL = $(SRCDIR)/laplacian_matrix.f
-SRCLHGM = $(SRCDIR)/lhs_gmres.f
-SRCGMRS = $(SRCDIR)/solve_gmres.f
-SRCGAUS = $(SRCDIR)/gauss_2.f90
 #
 # OBJECT FILES
 #
-OBJMAIN = $(OBJDIR)/home_ns.o
+OBJMAIN = $(OBJDIR)/home_diff.o
 OBJNUME = $(OBJDIR)/declarations_numerical.o
 OBJPHYS = $(OBJDIR)/declarations_physic.o
+OBJCSCS = $(OBJDIR)/csc_storage.o
+OBJDCSC = $(OBJDIR)/declarations_csc.o
 OBJWRHE = $(OBJDIR)/write_headers.o
-OBJPONS = $(OBJDIR)/point_ns.o
+OBJPONS = $(OBJDIR)/point_diff.o
+OBJALLC = $(OBJDIR)/all_csc.o
 OBJDIFF = $(OBJDIR)/diffusion_matrix.o
-OBJLAPL = $(OBJDIR)/laplacian_matrix.o
-OBJLHGM = $(OBJDIR)/lhs_gmres.o
-OBJGMRS = $(OBJDIR)/solve_gmres.o
-OBJGAUS = $(OBJDIR)/gauss_2.o
 #
-OBJECTS = $(OBJPHYS) $(OBJNUME) $(OBJWRHE) $(OBJPONS) $(OBJDIFF) \
-			   	$(OBJLHGM) $(OBJGMRS) $(OBJGAUS) $(OBJLAPL) $(OBJMAIN)
+OBJECTS = $(OBJDCSC) $(OBJCSCS) $(OBJPHYS) $(OBJNUME) $(OBJWRHE) \
+			   	$(OBJPONS) $(OBJALLC) $(OBJDIFF) $(OBJMAIN)
 #
 #
 # MODULE FILES
 #
 MODNUME = $(MODDIR)/declarations_numerical.mod
 MODPHYS = $(MODDIR)/declarations_physic.mod
+MODDCSC = $(MODDIR)/declarations_csc.mod
+MODCSCS = $(MODDIR)/csc_storage.mod
 #
-MODULES = $(MODPHYS) $(MODNUME)
+MODULES = $(MODDCSC) $(MODCSCS) $(MODPHYS) $(MODNUME)
 #
 #
 # BINARY FILES
 #
-BINNSFD = $(BINDIR)/ns_df.out
+BINNSFD = $(BINDIR)/diff_df.out
 #########################################################################
 #
 # !!!COMPILING!!!
 #
 $(BINNSFD): $(OBJECTS)
 	    $(FC) $(LFLAGS) $(OBJECTS) -o $(BINNSFD)
+
+$(OBJDCSC): $(SRCDCSC)
+	    $(FC) $(CFLAGS) $(SRCDCSC) -o $(OBJDCSC)
+
+$(OBJCSCS): $(SRCCSCS)
+	    $(FC) $(CFLAGS) $(SRCCSCS) -o $(OBJCSCS)
 
 $(OBJPHYS): $(SRCPHYS)
 	    $(FC) $(CFLAGS) $(SRCPHYS) -o $(OBJPHYS)
@@ -103,20 +109,11 @@ $(OBJWRHE): $(SRCWRHE)
 $(OBJPONS): $(SRCPONS)
 	    $(FC) $(CFLAGS) $(SRCPONS) -o $(OBJPONS)
 
+$(OBJALLC): $(SRCALLC)
+	    $(FC) $(CFLAGS) $(SRCALLC) -o $(OBJALLC)
+
 $(OBJDIFF): $(SRCDIFF)
 	    $(FC) $(CFLAGS) $(SRCDIFF) -o $(OBJDIFF)
-
-$(OBJLHGM): $(SRCLHGM)
-	    $(FC) $(CFLAGS) $(SRCLHGM) -o $(OBJLHGM)
-
-$(OBJGMRS): $(SRCGMRS)
-	    $(FC) $(CFLAGS) $(SRCGMRS) -o $(OBJGMRS)
-
-$(OBJGAUS): $(SRCGAUS)
-	    $(FC) $(CFLAGS) $(SRCGAUS) -o $(OBJGAUS)
-
-$(OBJLAPL): $(SRCLAPL)
-	    $(FC) $(CFLAGS) $(SRCLAPL) -o $(OBJLAPL)
 
 $(OBJMAIN): $(MODULES) $(SRCMAIN)
 	    $(FC) $(CFLAGS) $(SRCMAIN) -o $(OBJMAIN)

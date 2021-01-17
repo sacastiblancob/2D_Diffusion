@@ -1,133 +1,234 @@
-%SOLVER PARA UN DOMINIO COMPUTACIONAL 2D DE LA ECUACION DIFERENCIAL DE
-%TRANSPORTE - Metodo pasos fraccionados (PF)
 %
-%DOMINIO ESPACIAL   -a < x < b
-%                   -a < y < b
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%DOMINIO TEMPORAL   tincial < t < tfinal
-%   (donde t inicial es ligeramente mayor a t0)
+%  PONTIFICIA UNIVERSIDAD JAVERIANA
+%  SERGIO CASTIBLANCO
+%  METODOS NUMÉRICOS AVANZADOS
+%  SOLVER PARA DIFUSIÓN 2D
+%  PARA PROBAR RUTINAS CSC
 %
-%   En este caso particular se toma t0 = 1s (ver funcion analitica), y
-%   tinicial = 1s + dt
-%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%Diffusion coefficients
 Dx=0.25;
 Dy=0.25;
-u=0.1;
-v=0.1;
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Discretizacion espacial
-a=4;
-b=4;
-dx=1;
-dy=1;
-n=(a-(-b))/dx+1;
-m=(a-(-b))/dy+1;
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Limits of the domain
+xmin=-4;
+xmax=4;
+ymin=-4;
+ymax=4;
+
+%Number of nodes in X direction (n) and Y direction(m)
+n=8;
+m =8;
+
+%Space differentials
+dx = (xmax-xmin)/(n-1);
+dy = (ymax-ymin)/(n-1);
+
+%X and Y vectors
 x=-a:dx:b;
 y=-a:dy:b;
+
+%X and Y matrices
 X=kron(ones(1,m),x);
 Y1=kron(y,ones(1,n));
 Y=Y1(n*m:-1:1);
 MX=reshape(X,m,n)';
 MY=reshape(Y,m,n)';
 
-%Discretizacion temporal
+%Time discretization
 dt=.025;
 tinicial=1+dt;
 tfinal=10;
 t=tinicial+dt:dt:tfinal;
 
-%Constantes de la ecuacion diferencial computacional
+%Constants for difussion equation
 Sx=(Dx*dt)/(dx^2);
 Sy=(Dy*dt)/(dy^2);
-CFLx=(u*dt)/dx;
-CFLy=(v*dt)/dy;
 
-%Comprobacion de los parametros Sx, Sy, CFLx y CFLy
-if (Sx + Sy) <=0.5 && ((CFLx^2/Sx) + (CFLy^2/Sy)) <=2
-    disp("Los valores de Sx, Sy, CFLx y CFLy estan dentro de los limites adecuados")
-else
-    disp("ATENCION: Los valores de Sx, Sy, CFLx y CFLy no estan dentro de los limites adecuados")
-    return
-end
+%Boundary arrays for knowing which nodes are within it
+front=[1:n,n+1:n:n*m-2*n+1,2*n:n:n*m-n,n*m-n+1:n*m];
+front=sort(front);
+fronts=(n+3:2*n-2);
+frontd=(3*n-1:n:n*m-2*n-1);
+frontin=(n*m-2*n+3:n*m-n-2);
+frontiz=(2*n+2:n:n*m-3*n+2);
 
-%Valores de los nodos que estan en la frontera
-front=zeros(1,2*n+2*m-4);
-cont=n+1;
-for i=1:m
-    if i==1
-        front(1:n)=1:n;
-    elseif i==m
-        front(2*n+2*m-4-n:2*n+2*m-4)=n*m-n:m*n;
-    else
-        front(cont)=(i-1)*n+1;
-        front(cont+1)=i*n;
-        cont=cont+2;
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Computing Diffusion matrix
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%constants
+ap=(1+2*Sx+2*Sy);
+ax=-Sx;
+ay=-Sy;
+
+% % K full storage (not even in the best use of matlab sparse)
+K11=diag(ones(n-2,1));
+K12=ax*diag(ones(n-3,1),1)+ax*diag(ones(n-3,1),-1)+ap*diag(ones(n-2,1));
+K21=diag(ones(n-3,1),1)+diag(ones(n-3,1),-1);
+K22=ay*diag(ones(n-2,1));
+K=kron(K11,K12)+kron(K21,K22);
+dimen(iv) = length(K);
+%CondK=cond(K);
+%disp('Condicion de la matriz K es: '); disp(CondK);
+K=sparse(K);
+diagk = sparse(diag(diag(K)));
+
+% % K CSC storage
+%     [K11v,K11r,K11c] = csc_diag(ones(n-2,1),0);
+%     h1 = [ax*ones(n-2,1) ap*ones(n-2,1) ax*ones(n-2,1)];
+%     d1 = [-1 0 1];
+%     [K12v,K12r,K12c] = csc_diag(h1,d1);
+%     h2 = [ones(n-3,1) ones(n-3,1)];
+%     d2 = [-1 1];
+%     [K21v,K21r,K21c] = csc_diag(h2,d2);
+%     [K22v,K22r,K22c] = csc_diag(ay*ones(n-2,1),0);
+% 
+%     [K1v,K1r,K1c] = csc_kron(K11v,K11r,K11c,K12v,K12r,K12c);
+%     [K2v,K2r,K2c] = csc_kron(K21v,K21r,K21c,K22v,K22r,K22c);
+% 
+%     [Kv,Kr,Kc] = csc_sum(K1v,K1r,K1c,K2v,K2r,K2c);
+%     clearvars K11v K11r K11c K12v K12r K12c K21v K21r K21c K22v K22r K22c K1v K1r K1c K2v K2r K2c
+%     dimen(iv) = length(Kc)-1;
+
+% If Jacobi
+% %Jacobi
+% [Pv,Qv,Qc,Qr] = csc_prejacobi(Kv,Kr,Kc);
+
+% If SOR
+% %SOR
+% [Pv,Pr,Pc,Qv,Qr,Qc] = csc_preSOR(Kv,Kc,Kr,1.1);
+
+% If LU (really awfuly inefficient)
+%
+%     %Computing packed LU decomposition for matrix K (Full storage)
+%     LU = packlu(K);
+%
+%     %Computing packed LU decomposition for matrix K (CSC storage)
+% %     [LUv,LUr,LUc] = packlu_csc(Kv,Kr,Kc);
+%
+
+% SPY matrix K
+%spy(K)
+%csc_spy(Kv,Kr,Kc)
+
+%Solver
+
+Co=analitica(X,Y,tinicial,u,-v,Dx,Dy);
+conte=1;
+sizet=size(t);
+errorPF=zeros(1,sizet(2));
+Caux=ones(1,m*n-2*m-2*n+4);
+trash=zeros(n*m);
+times = 0;
+
+for i=tinicial+dt:dt:tfinal
+    Ca=analitica(X,Y,i,u,-v,Dx,Dy);
+    l=1;
+    for j=1:m*n
+        if find(j==front)
+            trash(j)=0;
+        elseif find(j==fronts)
+            Caux(l)=Co(j-1)*CFLx + Co(j-n)*CFLy + Co(j)*(1-CFLx-CFLy) - ay*Ca(j-n);
+            l=l+1;
+        elseif find(j==frontd)
+            Caux(l)=Co(j-1)*CFLx + Co(j-n)*CFLy + Co(j)*(1-CFLx-CFLy) - ax*Ca(j+1);
+            l=l+1;
+        elseif find(j==frontin)
+         Caux(l)=Co(j-1)*CFLx + Co(j-n)*CFLy + Co(j)*(1-CFLx-CFLy) - ay*Ca(j+n);
+            l=l+1;
+        elseif find(j==frontiz)
+            Caux(l)=Co(j-1)*CFLx + Co(j-n)*CFLy + Co(j)*(1-CFLx-CFLy) - ax*Ca(j-1);
+            l=l+1;
+        elseif j==n+2
+            Caux(l)=Co(j-1)*CFLx + Co(j-n)*CFLy + Co(j)*(1-CFLx-CFLy) - ay*Ca(j-n)-ax*Ca(j-1);
+            l=l+1;
+        elseif j==2*n-1
+            Caux(l)=Co(j-1)*CFLx + Co(j-n)*CFLy + Co(j)*(1-CFLx-CFLy) - ay*Ca(j-n)-ax*Ca(j+1);
+            l=l+1;
+        elseif j==n*m-2*n+2
+            Caux(l)=Co(j-1)*CFLx + Co(j-n)*CFLy + Co(j)*(1-CFLx-CFLy) - ay*Ca(j+n)-ax*Ca(j-1);
+            l=l+1;
+        elseif j==n*m-n-1
+            Caux(l)=Co(j-1)*CFLx + Co(j-n)*CFLy + Co(j)*(1-CFLx-CFLy) - ay*Ca(j+n)-ax*Ca(j+1);
+            l=l+1;
+        else
+            Caux(l)=Co(j-1)*CFLx + Co(j-n)*CFLy + Co(j)*(1-CFLx-CFLy);
+            l=l+1;
+        end
     end
-end
 
-%Ensamblaje matriz sistema de ecuaciones para el paso 2 del planteamiento
-%numerico
-
-A=zeros(n*m,n*m);
-for i=1:n*m
-    if find(i==front)
-        A(i,i)=1;
-    else
-        A(i,i)=(1+2*Sx+2*Sy);
-        A(i,i-1)=-Sx;
-        A(i,i+1)=-Sx;
-        A(i,i-n)=-Sy;
-        A(i,i+n)=-Sy;
+    if i == tinicial+dt
+        C = Caux';
     end
+
+    tol = 1E-6;
+    tic
+
+    % Matlab method
+    % C = K\(Caux');
+
+    % Matlab pcg
+    [x,flag,relres,t] = pcg(K,Caux',tol,100,diagk,speye(length(K)),C);
+
+    % Gaussian elimination
+    % C = elgauss(K,Caux');
+
+    % Pack-LU
+    % C = solpacklu(LU,Caux');
+
+    % Pack-LU CSC
+    % C = solpacklu_csc(LUv,LUr,LUc,Caux');
+
+    % %Jacobi CSC
+    % [C,t] = csc_jacobi(Kv,Kr,Kc,Pv,Qv,Qc,Qr,Caux',C,100,tol);
+
+    % %SOR CSC
+    % [C,t] = csc_SOR(Kv,Kr,Kc,Pv,Pr,Pc,Qv,Qr,Qc,Caux',C,100,tol);
+
+    % % CG CSC
+    % [C,t] = csc_CG(Kv,Kr,Kc,Caux',C,100,tol);
+
+    % % DPCG CSC
+    % [C,t] = csc_DPCG(Kv,Kr,Kc,Caux',C,100,tol);
+
+    times = times + 1;
+
+    CM = reshape(C,n-2,m-2);
+    C1 = [pi*ones(1,n-2);CM;pi*ones(1,n-2)];
+    C1 = C1(:)';
+    C2 = [pi*ones(1,n),C1,pi*ones(1,n)];
+    C2(C2==pi)=Ca(C2==pi);
+
+%         %MCc=reshape(C,m,n)';
+%         MCc = reshape(C2,m,n)';
+% %         MCa=reshape(Co,m,n)'; 
+%         surf(MX,MY,MCc); axis([-4 4 -4 4 -1 8]); view(2)
+%         drawnow;
+%         %pause(dt)
+%         %errorPF(conte)=norm(C2-Ca);
+%         %conte=conte+1;
+    Co=C2;
 end
-CondA=cond(A);
-disp('Condicion de la matriz A es: '); disp(CondA);
-% A = sparse(A);
+tes(iv) = tes(iv)/times;
+%toc
+%ultimos valores de concentracion calculados reorganizados en matrices
+
+%     MCc=reshape(C2,m,n)';                            %C calculada reordenada en matriz 
+%     MCa=reshape(Ca,m,n)';                           %C analitica reordenada en matriz
+%     MdifPF=reshape(Ca-C2,m,n)';                        %Diferencia entra C analitica y C calculada reordenada en matriz
 % 
-% % spy(A)
+%     % plot(t,log10(errorPF))                          %Grafica de la evolucion del error en el tiempo
+%     % xlabel('Tiempo (t)')
+%     % ylabel('Log10(error)')
 % 
-% %Solver
-% 
-% Co=analitica(X,Y,tinicial,u,-v,Dx,Dy);
-% conte=1;
-% sizet=size(t);
-% errorPF=zeros(1,sizet(2));
-% Caux=zeros(1,m*n);
-% tic
-% for i=tinicial+dt:dt:tfinal
-%     Ca=analitica(X,Y,i,u,-v,Dx,Dy);
-%     for j=1:m*n
-%         if find(j==front)
-%             Caux(j)=analitica(X(j),Y(j),i,u,-v,Dx,Dy);
-%         else
-%             Caux(j)=Co(j-1)*CFLx + Co(j-n)*CFLy + Co(j)*(1-CFLx-CFLy);      %Paso 1, calculo de Caux explicito
-%         end
-%     end
-%     C = A\(Caux');                                                          %Paso 2, calculo de C(t+1) implicito
-%     C=C';
-%     
-%     %MCc=reshape(C,m,n)';
-%     %MCa=reshape(Ca,m,n)'; 
-%     %surf(MX,MY,MCa-MCc); axis([-4 4 -4 4 -1 8]); %view(2)
-%     %drawnow;
-%     %pause(dt)
-%     errorPF(conte)=norm(C-Ca);
-%     conte=conte+1;
-%     Co=C;
-% end
-% toc
-% %ultimos valores de concentracion calculados reorganizados en matrices
-% 
-% MCc=reshape(C,m,n)';                            %C calculada reordenada en matriz 
-% MCa=reshape(Ca,m,n)';                           %C analitica reordenada en matriz
-% MdifPF=reshape(Ca-C,m,n)';                        %Diferencia entra C analitica y C calculada reordenada en matriz
-% 
-% plot(t,log10(errorPF))                          %Grafica de la evolucion del error en el tiempo
-% xlabel('Tiempo (t)')
-% ylabel('Log10(error)')
-% 
-% conv=log10(dt+dx^2);                             %Orden de convergencia
-% faccon=[Sx,Sy,CFLx,CFLy,Sx+Sy,CFLx+CFLy];        %Factores de convergencia
-% 
-% %end
+%     conv=log10(dt+dx^2);                             %Orden de convergencia
+%     faccon=[Sx,Sy,CFLx,CFLy,Sx+Sy,CFLx+CFLy];        %Factores de convergencia
+
+%end

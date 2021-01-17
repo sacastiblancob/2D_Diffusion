@@ -1,13 +1,13 @@
-!                    ***************
-                     PROGRAM HOME_NS
-!                    ***************
+!                    *****************
+                     PROGRAM HOME_DIFF
+!                    *****************
 !
 !
 !***********************************************************************
-! NAVIER STOKES SOLVER - FINITE DIFFERENCES
+! 2D DIFUSSION SOLVER - FINITE DIFFERENCES
 !***********************************************************************
 !
-!brief    1) MAIN PROGRAM NAVIER STOKES SOLVER.
+!brief    1) MAIN PROGRAM 2D-DIFFUSION SOLVER.
 !
 !history  Sergio Castiblanco
 !+        12/01/2021
@@ -29,10 +29,11 @@
 !
 !  READING USER INPUT FILE
 !
-      NAMELIST /NSCONF/ NU,RHO,NX,NY,XMIN,XMAX,YMIN,YMAX,TO,TF,DEBUG
+      NAMELIST /DIFFCONF/ VX,VY,NX,NY,XMIN,XMAX,YMIN,YMAX,TO,TF,ISADI,
+     &     DEBUG
 !
-      OPEN(1010, FILE = "nsconf.nml", STATUS = 'OLD')
-      READ(1010, NML = NSCONF)
+      OPEN(1010, FILE = "diffconf.nml", STATUS = 'OLD')
+      READ(1010, NML = DIFFCONF)
       CLOSE(1010)
       IF(DEBUG) WRITE(LU,*) 'EXIT READING USER ENTRIES'
 !
@@ -44,23 +45,16 @@
 !
 !  ALLOCATING MEMORY AND SETTING INITIAL CONDITION
 !
-      IF(DEBUG) WRITE(LU,*) 'GOING INTO POINT_NS'
-      CALL POINT_NS
-      IF(DEBUG) WRITE(LU,*) 'EXIT POINT_NS'
+      IF(DEBUG) WRITE(LU,*) 'GOING INTO POINT_DIFF'
+      CALL POINT_DIFF
+      IF(DEBUG) WRITE(LU,*) 'EXIT POINT_DIFF'
 !
 !  COMPUTING STIFFNESS DIFUSSION MATRIX
 !
       IF(DEBUG) WRITE(LU,*) 'GOING INTO DIFFUSION_MATRIX'
-      CALL DIFFUSION_MATRIX(DX,DY,DT,NU,BOUND,UPBOUND,DOBOUND,RIBOUND,
-     &     LEBOUND,BOUNDINT,K,SX,SY) 
+      CALL DIFFUSION_MATRIX(DX,DY,DT,VX,VY,BOUND,UPBOUND,DOBOUND,
+     &     RIBOUND,LEBOUND,KM,SX,SY) 
       IF(DEBUG) WRITE(LU,*) 'EXIT DIFFUSION_MATRIX'
-!
-!  COMPUTING LAPLACIAN OPERATOR MATRIX FOR SOLVE POISSON EQUATION
-!
-      IF(DEBUG) WRITE(LU,*) 'GOING INTO LAPLACIAN_MATRIX'
-      CALL LAPLACIAN_MATRIX(DX,DY,BOUND,UPBOUND,DOBOUND,RIBOUND,LEBOUND,
-     &     BOUNDINT,L,EVECO)
-      IF(DEBUG) WRITE(LU,*) 'EXIT LAPLACIAN_MATRIX'
 !
 !
 !

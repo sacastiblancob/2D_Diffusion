@@ -2,12 +2,11 @@
                 MODULE DECLARATIONS_PHYSIC
 !               **************************
 !
-!
 !***********************************************************************
-! NAVIER STOKES SOLVER - FINITE DIFFERENCES
+! 2D_DIFFUSION SOLVER - FINITE DIFFERENCES
 !***********************************************************************
 !
-!brief    DECLARATION OF PHYSICAL CONSTANTS FOR NS SOLVER
+!brief    DECLARATION OF PHYSICAL CONSTANTS FOR DIFFUSION SOLVER
 !
 !history  Sergio Castiblanco
 !+        12/01/2021
@@ -15,18 +14,17 @@
 !
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      IMPLICIT NONE
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !     DOUBLE PRECISION
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !                    
-!     KINEMATIC VISCOSITY
+!     DIFFUSION COEFFICIENTS
 !
-      DOUBLE PRECISION :: NU
-!
-!     WATER DENSITY
-!
-      DOUBLE PRECISION :: RHO
+      DOUBLE PRECISION :: VX
+      DOUBLE PRECISION :: VY
 !
 !     ============================================
 !

@@ -4,16 +4,20 @@
 !
 !
 !***********************************************************************
-! NAVIER STOKES SOLVER - FINITE DIFFERENCES
+! 2D-DIFFUSION SOLVER - FINITE DIFFERENCES
 !***********************************************************************
 !
-!brief    DECLARATION OF NUMERICAL VARIABLES FOR NS SOLVER
+!brief    DECLARATION OF NUMERICAL VARIABLES FOR DIFFUSION SOLVER
 !
 !history  Sergio Castiblanco
-!+        12/01/2021
+!+        16/01/2021
 !+        Translation for original Matlab implementation
 !
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+!
+      USE DECLARATIONS_CSC
+      IMPLICIT NONE
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -23,6 +27,10 @@
 ! DEBUGGER OPTION
 !
       LOGICAL :: DEBUG
+!
+! ADI SOLVER OPTION
+!
+      LOGICAL :: ISADI
 !
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !     INTEGERS
@@ -41,11 +49,12 @@
 !
       INTEGER, ALLOCATABLE :: POS(:)
       INTEGER, ALLOCATABLE :: MPOS(:,:)
+      INTEGER, ALLOCATABLE :: MPOS2(:,:)
 !
 ! BOUNDARY INDEXES
 !
       INTEGER, ALLOCATABLE :: BOUND(:), UPBOUND(:), DOBOUND(:),
-     &    RIBOUND(:), LEBOUND(:), BOUNDINT(:)
+     &    RIBOUND(:), LEBOUND(:)
 !
 ! NUMBER OF TIME STEPS
 !
@@ -74,21 +83,17 @@
 !     FINAL TIME
       DOUBLE PRECISION :: TF
 !
-! DESIRED COURANT NUMBER
-!
-      DOUBLE PRECISION :: CFL = 0.25
-!
 ! GRID
 !
       DOUBLE PRECISION, ALLOCATABLE :: X(:), Y(:)
 !
-! STIFFNESS AND LAPLACE MATRICES
+! STIFFNESS MATRIX
 !
-      DOUBLE PRECISION, ALLOCATABLE :: K(:,:), L(:,:)
+      TYPE(CSC_OBJ) :: KM
 !
-! VELOCITIES VECTORS
+! TRACER VECTOR
 !
-      DOUBLE PRECISION, ALLOCATABLE :: UO(:),VO(:)
+      DOUBLE PRECISION, ALLOCATABLE :: CO(:)
 !
 ! TIME AND TIME STEP
 !
@@ -99,10 +104,6 @@
 !
       DOUBLE PRECISION :: SX
       DOUBLE PRECISION :: SY
-!
-! VECTOR WITH THE SMALLEST RELATED EIGENVECTOR OF L
-!
-      DOUBLE PRECISION, ALLOCATABLE :: EVECO(:)
 !
 !     ============================================
 !

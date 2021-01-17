@@ -1,8 +1,21 @@
-!                       *******************
-                        SUBROUTINE POINT_NS
-!                       *******************
+!                       *********************
+                        SUBROUTINE POINT_DIFF
+!                       *********************
 !
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+!***********************************************************************
+! 2D DIFUSSION SOLVER - FINITE DIFFERENCES
+!***********************************************************************
+!
+!brief    1) ALLOCATING AND COMPUTING INITIAL CONSTANTS AND SETUP.
+!
+!history  Sergio Castiblanco
+!+        16/01/2021
+!+        Translation for original Matlab implementation
+!
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+!
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       USE DECLARATIONS_PHYSIC
       USE DECLARATIONS_NUMERICAL
@@ -40,29 +53,12 @@
       RIBOUND = 1
       ALLOCATE(LEBOUND(NY-2))
       LEBOUND = 1
-      ALLOCATE(BOUNDINT(2*(NX-2) + 2*(NY-4)))
-      BOUNDINT = 1
 !
-! ALLOCATE STIFFNESS AND LAPLACE MATRICES
+! ALLOCATE TRACER VECTOR
 !
-      IF(DEBUG) WRITE(LU,*) 'ALLOCATING STIFFNESS AND LAPLACE MATRICES'
-      ALLOCATE(K(NX*NY,NX*NY))
-      K = 0D0
-      ALLOCATE(L(NX*NY,NX*NY))
-      L = 0D0
-!
-! ALLOCATE SMALLEST RELATED EIGENVECTOR
-!
-      ALLOCATE(EVECO(NX*NY))
-      EVECO = 0D0
-!
-! ALLOCATE VELOCITIES VECTORS
-!
-      IF(DEBUG) WRITE(LU,*) 'ALLOCATING VELOCITY VECTORS'
-      ALLOCATE(UO(NX*NY))
-      UO = 0D0
-      ALLOCATE(VO(NX*NY))
-      VO = 0D0
+      IF(DEBUG) WRITE(LU,*) 'ALLOCATING TRACER VECTOR'
+      ALLOCATE(CO(NX*NY))
+      CO = 0D0
 !
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !  GRID - GRID - GRID - GRID
@@ -118,11 +114,6 @@
 !
 !     ALL BOUNDARIES TOGETHER
       BOUND = [UPBOUND,DOBOUND,RIBOUND,LEBOUND]
-!
-!     INTERNAL BOUNDARY
-      BOUNDINT = [MPOS(2,2:NX-1),MPOS(NY-1,2:NX-1),
-     &    MPOS(3:NY-2,NX-1), MPOS(3:NY-2,2)]
-!
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ! END GRID - END GRID - END GRID
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -131,15 +122,10 @@
 ! TIME - TIME - TIME - TIME
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !
-! SETTING INITIAL CONDITION
-!
-      IF(DEBUG) WRITE(LU,*) 'SETTING INITIAL CONDITION'
-      UO(1:NX) = 1.0D0
-!
 ! SETTING TIME PARAMETERS
 !
       IF(DEBUG) WRITE(LU,*) 'COMPUTING DT AND NT'
-      DT = MIN(DX,DY)*CFL/ABS(UO(1))
+      DT = (0.5*MIN(DX,DY)**2)/MAX(VX,VY)
       NT = INT(FLOOR((TF-TO)/DT))
 !
 ! ALLOCATE TIME VECTOR
@@ -159,7 +145,7 @@
 !
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !
-      END SUBROUTINE POINT_NS
+      END SUBROUTINE POINT_DIFF
 
 
 
