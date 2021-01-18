@@ -126,6 +126,7 @@
 !
       IF(DEBUG) WRITE(LU,*) 'COMPUTING DT AND NT'
       DT = (0.5*MIN(DX,DY)**2)/MAX(VX,VY)
+      DT = 0.025
       NT = INT(FLOOR((TF-TO)/DT))
 !
 ! ALLOCATE TIME VECTOR

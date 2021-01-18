@@ -28,11 +28,18 @@ function [Cv,Cr,Cc] = csc_kron(Av,Ar,Ac,Bv,Br,Bc)
 %      Pontificia Universidad Javeriana - Bogotá
 %
 
+%Number of columns of A and B
 ma = length(Ac)-1;
 mb = length(Bc)-1;
+
+%Non-zeros of A and B
 nza = Ac(ma+1)-1;
 nzb = Bc(mb+1)-1;
+
+%Number of rows of B
 nb = max(Br);
+
+%Number of columns of C
 mc = ma*mb;
 nzc = nza*nzb;
 Cc = zeros(mc+1,1);

@@ -66,6 +66,7 @@
 !     CHECKING ALLOCATE
       IF(ERR.NE.0) THEN
         WRITE(*,*) 'ALLOCATE ERROR IN ', OBJ%NAM
+        STOP 1
       ENDIF
       ERR = 0
 !
@@ -84,28 +85,30 @@
 !     CHECKING ALLOCATE
       IF(ERR.NE.0) THEN
         WRITE(*,*) 'ALLOCATE ERROR IN ', OBJ%NAM
+        STOP 1
       ENDIF
       ERR = 0
 !
-!     FILLING WITH ONES
-      OBJ%V = 1
+!     FILLING WITH ZEROS
+      OBJ%R = 0 
 !
 !     COLUMN RELATED INDICES VECTOR
       IF(.NOT.ASSOCIATED(OBJ%C)) THEN
-        ALLOCATE(OBJ%C(OBJ%NC),STAT=ERR)
+        ALLOCATE(OBJ%C(OBJ%NC+1),STAT=ERR)
       ELSE
         WRITE(*,*) 'DEALLOCATING AND REALLOCATING %C OF OBJ ', OBJ%NAM
         DEALLOCATE(OBJ%C)
-        ALLOCATE(OBJ%C(OBJ%NC),STAT=ERR)
+        ALLOCATE(OBJ%C(OBJ%NC+1),STAT=ERR)
       ENDIF
 !
 !     CHECKING ALLOCATE
       IF(ERR.NE.0) THEN
         WRITE(*,*) 'ALLOCATE ERROR IN ', OBJ%NAM
+        STOP 1
       ENDIF
 !
 !     FILLING WITH NC+1
-      OBJ%V = OBJ%NC+1
+      OBJ%C = 0
 !
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !

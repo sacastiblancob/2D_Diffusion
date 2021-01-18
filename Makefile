@@ -53,6 +53,9 @@ SRCDCSC = $(SRCDIR)/declarations_csc.f
 SRCWRHE = $(SRCDIR)/write_headers.f
 SRCPONS = $(SRCDIR)/point_diff.f
 SRCALLC = $(SRCDIR)/all_csc.f
+SRCDIAG = $(SRCDIR)/csc_diag.f
+SRCKRON = $(SRCDIR)/csc_kron.f
+SRCSUMC = $(SRCDIR)/csc_sum.f
 SRCDIFF = $(SRCDIR)/diffusion_matrix.f
 #
 # OBJECT FILES
@@ -65,10 +68,14 @@ OBJDCSC = $(OBJDIR)/declarations_csc.o
 OBJWRHE = $(OBJDIR)/write_headers.o
 OBJPONS = $(OBJDIR)/point_diff.o
 OBJALLC = $(OBJDIR)/all_csc.o
+OBJDIAG = $(OBJDIR)/csc_diag.o
+OBJKRON = $(OBJDIR)/csc_kron.o
+OBJSUMC = $(OBJDIR)/csc_sum.o
 OBJDIFF = $(OBJDIR)/diffusion_matrix.o
 #
 OBJECTS = $(OBJDCSC) $(OBJCSCS) $(OBJPHYS) $(OBJNUME) $(OBJWRHE) \
-			   	$(OBJPONS) $(OBJALLC) $(OBJDIFF) $(OBJMAIN)
+			   	$(OBJPONS) $(OBJALLC) $(OBJDIAG) $(OBJKRON) $(OBJSUMC) \
+				 	$(OBJDIFF) $(OBJMAIN)
 #
 #
 # MODULE FILES
@@ -111,6 +118,15 @@ $(OBJPONS): $(SRCPONS)
 
 $(OBJALLC): $(SRCALLC)
 	    $(FC) $(CFLAGS) $(SRCALLC) -o $(OBJALLC)
+
+$(OBJDIAG): $(SRCDIAG)
+	    $(FC) $(CFLAGS) $(SRCDIAG) -o $(OBJDIAG)
+
+$(OBJKRON): $(SRCKRON)
+	    $(FC) $(CFLAGS) $(SRCKRON) -o $(OBJKRON)
+
+$(OBJSUMC): $(SRCSUMC)
+	    $(FC) $(CFLAGS) $(SRCSUMC) -o $(OBJSUMC)
 
 $(OBJDIFF): $(SRCDIFF)
 	    $(FC) $(CFLAGS) $(SRCDIFF) -o $(OBJDIFF)
