@@ -60,6 +60,12 @@
       ALLOCATE(CO(NX*NY))
       CO = 0D0
 !
+! ALLOCATE DUMMY VELOCITIES
+!
+      IF(DEBUG) WRITE(LU,*) 'ALLOCATING DUMMY VELOCITIES'
+      ALLOCATE(DUMMYU(NX*NY))
+      DUMMYU = 0D0
+!
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !  GRID - GRID - GRID - GRID
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

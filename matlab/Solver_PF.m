@@ -12,6 +12,8 @@
 %Diffusion coefficients
 Dx=0.25;
 Dy=0.25;
+u = 0;
+v = 0;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Discretizacion espacial
@@ -118,117 +120,125 @@ d2 = [-1 1];
 %spy(K)
 %csc_spy(Kv,Kr,Kc)
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Solver
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Co=analitica(X,Y,tinicial,u,-v,Dx,Dy);
-% conte=1;
-% sizet=size(t);
-% errorPF=zeros(1,sizet(2));
-% Caux=ones(1,m*n-2*m-2*n+4);
-% trash=zeros(n*m);
-% times = 0;
+%Initial condition
+Co=analitica(X,Y,tinicial,u,-v,Dx,Dy);
+conte=1;
+
+%Error vector
+sizet=size(t);
+errorPF=zeros(1,sizet(2));
+
+%Caux for handling boundary conditions
+Caux=ones(1,m*n-2*m-2*n+4);
+trash=zeros(n*m);
+
+%Time loop
+times = 0;
+for i=tinicial+dt:dt:tfinal
+    Ca=analitica(X,Y,i,u,-v,Dx,Dy);
+    l=1;
+    for j=1:m*n
+        if find(j==front)
+            trash(j)=0;
+        elseif find(j==fronts)
+            Caux(l)=Co(j-1)*CFLx + Co(j-n)*CFLy + Co(j)*(1-CFLx-CFLy) - ay*Ca(j-n);
+            l=l+1;
+        elseif find(j==frontd)
+            Caux(l)=Co(j-1)*CFLx + Co(j-n)*CFLy + Co(j)*(1-CFLx-CFLy) - ax*Ca(j+1);
+            l=l+1;
+        elseif find(j==frontin)
+         Caux(l)=Co(j-1)*CFLx + Co(j-n)*CFLy + Co(j)*(1-CFLx-CFLy) - ay*Ca(j+n);
+            l=l+1;
+        elseif find(j==frontiz)
+            Caux(l)=Co(j-1)*CFLx + Co(j-n)*CFLy + Co(j)*(1-CFLx-CFLy) - ax*Ca(j-1);
+            l=l+1;
+        elseif j==n+2
+            Caux(l)=Co(j-1)*CFLx + Co(j-n)*CFLy + Co(j)*(1-CFLx-CFLy) - ay*Ca(j-n)-ax*Ca(j-1);
+            l=l+1;
+        elseif j==2*n-1
+            Caux(l)=Co(j-1)*CFLx + Co(j-n)*CFLy + Co(j)*(1-CFLx-CFLy) - ay*Ca(j-n)-ax*Ca(j+1);
+            l=l+1;
+        elseif j==n*m-2*n+2
+            Caux(l)=Co(j-1)*CFLx + Co(j-n)*CFLy + Co(j)*(1-CFLx-CFLy) - ay*Ca(j+n)-ax*Ca(j-1);
+            l=l+1;
+        elseif j==n*m-n-1
+            Caux(l)=Co(j-1)*CFLx + Co(j-n)*CFLy + Co(j)*(1-CFLx-CFLy) - ay*Ca(j+n)-ax*Ca(j+1);
+            l=l+1;
+        else
+            Caux(l)=Co(j-1)*CFLx + Co(j-n)*CFLy + Co(j)*(1-CFLx-CFLy);
+            l=l+1;
+        end
+    end
+
+    if i == tinicial+dt
+        C = Caux';
+    end
+
+    tol = 1E-6;
+    tic
+
+    % Matlab method
+    % C = K\(Caux');
+
+    % Matlab pcg
+    % [x,flag,relres,t] = pcg(K,Caux',tol,100,diagk,speye(length(K)),C);
+
+    % Gaussian elimination
+    % C = elgauss(K,Caux');
+
+    % Pack-LU
+    % C = solpacklu(LU,Caux');
+
+    % Pack-LU CSC
+    % C = solpacklu_csc(LUv,LUr,LUc,Caux');
+
+    % %Jacobi CSC
+    % [C,t] = csc_jacobi(Kv,Kr,Kc,Pv,Qv,Qc,Qr,Caux',C,100,tol);
+
+    % %SOR CSC
+    % [C,t] = csc_SOR(Kv,Kr,Kc,Pv,Pr,Pc,Qv,Qr,Qc,Caux',C,100,tol);
+
+    % % CG CSC
+    [C,t] = csc_CG(Kv,Kr,Kc,Caux',C,100,tol);
+
+    % % DPCG CSC
+    % [C,t] = csc_DPCG(Kv,Kr,Kc,Caux',C,100,tol);
+
+    times = times + 1;
+
+    CM = reshape(C,n-2,m-2);
+    C1 = [pi*ones(1,n-2);CM;pi*ones(1,n-2)];
+    C1 = C1(:)';
+    C2 = [pi*ones(1,n),C1,pi*ones(1,n)];
+    C2(C2==pi)=Ca(C2==pi);
+
+%         %MCc=reshape(C,m,n)';
+%         MCc = reshape(C2,m,n)';
+% %         MCa=reshape(Co,m,n)'; 
+%         surf(MX,MY,MCc); axis([-4 4 -4 4 -1 8]); view(2)
+%         drawnow;
+%         %pause(dt)
+%         %errorPF(conte)=norm(C2-Ca);
+%         %conte=conte+1;
+    Co=C2;
+end
+tes(iv) = tes(iv)/times;
+%toc
+%ultimos valores de concentracion calculados reorganizados en matrices
+
+%     MCc=reshape(C2,m,n)';                            %C calculada reordenada en matriz 
+%     MCa=reshape(Ca,m,n)';                           %C analitica reordenada en matriz
+%     MdifPF=reshape(Ca-C2,m,n)';                        %Diferencia entra C analitica y C calculada reordenada en matriz
 % 
-% for i=tinicial+dt:dt:tfinal
-%     Ca=analitica(X,Y,i,u,-v,Dx,Dy);
-%     l=1;
-%     for j=1:m*n
-%         if find(j==front)
-%             trash(j)=0;
-%         elseif find(j==fronts)
-%             Caux(l)=Co(j-1)*CFLx + Co(j-n)*CFLy + Co(j)*(1-CFLx-CFLy) - ay*Ca(j-n);
-%             l=l+1;
-%         elseif find(j==frontd)
-%             Caux(l)=Co(j-1)*CFLx + Co(j-n)*CFLy + Co(j)*(1-CFLx-CFLy) - ax*Ca(j+1);
-%             l=l+1;
-%         elseif find(j==frontin)
-%          Caux(l)=Co(j-1)*CFLx + Co(j-n)*CFLy + Co(j)*(1-CFLx-CFLy) - ay*Ca(j+n);
-%             l=l+1;
-%         elseif find(j==frontiz)
-%             Caux(l)=Co(j-1)*CFLx + Co(j-n)*CFLy + Co(j)*(1-CFLx-CFLy) - ax*Ca(j-1);
-%             l=l+1;
-%         elseif j==n+2
-%             Caux(l)=Co(j-1)*CFLx + Co(j-n)*CFLy + Co(j)*(1-CFLx-CFLy) - ay*Ca(j-n)-ax*Ca(j-1);
-%             l=l+1;
-%         elseif j==2*n-1
-%             Caux(l)=Co(j-1)*CFLx + Co(j-n)*CFLy + Co(j)*(1-CFLx-CFLy) - ay*Ca(j-n)-ax*Ca(j+1);
-%             l=l+1;
-%         elseif j==n*m-2*n+2
-%             Caux(l)=Co(j-1)*CFLx + Co(j-n)*CFLy + Co(j)*(1-CFLx-CFLy) - ay*Ca(j+n)-ax*Ca(j-1);
-%             l=l+1;
-%         elseif j==n*m-n-1
-%             Caux(l)=Co(j-1)*CFLx + Co(j-n)*CFLy + Co(j)*(1-CFLx-CFLy) - ay*Ca(j+n)-ax*Ca(j+1);
-%             l=l+1;
-%         else
-%             Caux(l)=Co(j-1)*CFLx + Co(j-n)*CFLy + Co(j)*(1-CFLx-CFLy);
-%             l=l+1;
-%         end
-%     end
+%     % plot(t,log10(errorPF))                          %Grafica de la evolucion del error en el tiempo
+%     % xlabel('Tiempo (t)')
+%     % ylabel('Log10(error)')
 % 
-%     if i == tinicial+dt
-%         C = Caux';
-%     end
-% 
-%     tol = 1E-6;
-%     tic
-% 
-%     % Matlab method
-%     % C = K\(Caux');
-% 
-%     % Matlab pcg
-%     [x,flag,relres,t] = pcg(K,Caux',tol,100,diagk,speye(length(K)),C);
-% 
-%     % Gaussian elimination
-%     % C = elgauss(K,Caux');
-% 
-%     % Pack-LU
-%     % C = solpacklu(LU,Caux');
-% 
-%     % Pack-LU CSC
-%     % C = solpacklu_csc(LUv,LUr,LUc,Caux');
-% 
-%     % %Jacobi CSC
-%     % [C,t] = csc_jacobi(Kv,Kr,Kc,Pv,Qv,Qc,Qr,Caux',C,100,tol);
-% 
-%     % %SOR CSC
-%     % [C,t] = csc_SOR(Kv,Kr,Kc,Pv,Pr,Pc,Qv,Qr,Qc,Caux',C,100,tol);
-% 
-%     % % CG CSC
-%     % [C,t] = csc_CG(Kv,Kr,Kc,Caux',C,100,tol);
-% 
-%     % % DPCG CSC
-%     % [C,t] = csc_DPCG(Kv,Kr,Kc,Caux',C,100,tol);
-% 
-%     times = times + 1;
-% 
-%     CM = reshape(C,n-2,m-2);
-%     C1 = [pi*ones(1,n-2);CM;pi*ones(1,n-2)];
-%     C1 = C1(:)';
-%     C2 = [pi*ones(1,n),C1,pi*ones(1,n)];
-%     C2(C2==pi)=Ca(C2==pi);
-% 
-% %         %MCc=reshape(C,m,n)';
-% %         MCc = reshape(C2,m,n)';
-% % %         MCa=reshape(Co,m,n)'; 
-% %         surf(MX,MY,MCc); axis([-4 4 -4 4 -1 8]); view(2)
-% %         drawnow;
-% %         %pause(dt)
-% %         %errorPF(conte)=norm(C2-Ca);
-% %         %conte=conte+1;
-%     Co=C2;
-% end
-% tes(iv) = tes(iv)/times;
-% %toc
-% %ultimos valores de concentracion calculados reorganizados en matrices
-% 
-% %     MCc=reshape(C2,m,n)';                            %C calculada reordenada en matriz 
-% %     MCa=reshape(Ca,m,n)';                           %C analitica reordenada en matriz
-% %     MdifPF=reshape(Ca-C2,m,n)';                        %Diferencia entra C analitica y C calculada reordenada en matriz
-% % 
-% %     % plot(t,log10(errorPF))                          %Grafica de la evolucion del error en el tiempo
-% %     % xlabel('Tiempo (t)')
-% %     % ylabel('Log10(error)')
-% % 
-% %     conv=log10(dt+dx^2);                             %Orden de convergencia
-% %     faccon=[Sx,Sy,CFLx,CFLy,Sx+Sy,CFLx+CFLy];        %Factores de convergencia
-% 
-% %end
+%     conv=log10(dt+dx^2);                             %Orden de convergencia
+%     faccon=[Sx,Sy,CFLx,CFLy,Sx+Sy,CFLx+CFLy];        %Factores de convergencia
+
+%end

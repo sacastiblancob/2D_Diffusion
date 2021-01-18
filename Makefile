@@ -57,6 +57,7 @@ SRCDIAG = $(SRCDIR)/csc_diag.f
 SRCKRON = $(SRCDIR)/csc_kron.f
 SRCSUMC = $(SRCDIR)/csc_sum.f
 SRCDIFF = $(SRCDIR)/diffusion_matrix.f
+SRCFANA = $(SRCDIR)/analytical.f
 #
 # OBJECT FILES
 #
@@ -72,10 +73,11 @@ OBJDIAG = $(OBJDIR)/csc_diag.o
 OBJKRON = $(OBJDIR)/csc_kron.o
 OBJSUMC = $(OBJDIR)/csc_sum.o
 OBJDIFF = $(OBJDIR)/diffusion_matrix.o
+OBJFANA = $(OBJDIR)/analytical.o
 #
 OBJECTS = $(OBJDCSC) $(OBJCSCS) $(OBJPHYS) $(OBJNUME) $(OBJWRHE) \
 			   	$(OBJPONS) $(OBJALLC) $(OBJDIAG) $(OBJKRON) $(OBJSUMC) \
-				 	$(OBJDIFF) $(OBJMAIN)
+				 	$(OBJDIFF) $(OBJFANA) $(OBJMAIN)
 #
 #
 # MODULE FILES
@@ -130,6 +132,9 @@ $(OBJSUMC): $(SRCSUMC)
 
 $(OBJDIFF): $(SRCDIFF)
 	    $(FC) $(CFLAGS) $(SRCDIFF) -o $(OBJDIFF)
+
+$(OBJFANA): $(SRCFANA)
+	    $(FC) $(CFLAGS) $(SRCFANA) -o $(OBJFANA)
 
 $(OBJMAIN): $(MODULES) $(SRCMAIN)
 	    $(FC) $(CFLAGS) $(SRCMAIN) -o $(OBJMAIN)
