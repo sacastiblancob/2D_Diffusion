@@ -27,12 +27,12 @@ ymin=-4;
 ymax=4;
 
 %Number of nodes in X direction (n) and Y direction(m)
-n=51;
-m =51;
+n=11;
+m =21;
 
 %Space differentials
 dx = (xmax-xmin)/(n-1);
-dy = (ymax-ymin)/(n-1);
+dy = (ymax-ymin)/(m-1);
 
 %X and Y vectors
 x=xmin:dx:xmax;
@@ -43,13 +43,13 @@ X=kron(ones(1,m),x);
 Y1=kron(y,ones(1,n));
 % Y=Y1(n*m:-1:1);
 Y = Y1;
-Yaux = Y1(n*m:-1:1);
-MX=reshape(X,m,n)';
-MY=reshape(Yaux,m,n)';
+MX=reshape(X,n,m)';
+MY=reshape(Y,m,n)';
 
 %Time discretization
-dt=.025;
-tinicial=1+dt;
+% dt=.025;
+dt=.0128;
+tinicial=2;
 tfinal=10;
 t=tinicial+dt:dt:tfinal;
 
@@ -60,10 +60,6 @@ Sy=(Dy*dt)/(dy^2);
 %Boundary arrays for knowing which nodes are within it
 front=[1:n,n+1:n:n*m-2*n+1,2*n:n:n*m-n,n*m-n+1:n*m];
 front=sort(front);
-% fronts=(n+3:2*n-2);
-% frontd=(3*n-1:n:n*m-2*n-1);
-% frontin=(n*m-2*n+3:n*m-n-2);
-% frontiz=(2*n+2:n:n*m-3*n+2);
 frontin=(n+3:2*n-2);
 frontd=(3*n-1:n:n*m-2*n-1);
 fronts=(n*m-2*n+3:n*m-n-2);
@@ -134,6 +130,7 @@ d2 = [-1 1];
 %Initial condition
 Co=analitica(X,Y,tinicial,u,-v,Dx,Dy);
 conte=1;
+zlims = max(Co)
 
 %Error vector
 sizet=size(t);
@@ -211,14 +208,13 @@ for i=tinicial+dt:dt:tfinal
 
     % % CG CSC
     [C,t] = csc_CG(Kv,Kr,Kc,Caux',C,100,tol);
-
+    %t
     % % DPCG CSC
     % [C,t] = csc_DPCG(Kv,Kr,Kc,Caux',C,100,tol);
 
     times = times + 1;
     
-    Cplot = C((n-2)*(m-2):-1:1);
-    CM = reshape(Cplot,n-2,m-2);
+    CM = reshape(C,n-2,m-2);
     C1 = [pi*ones(1,n-2);CM;pi*ones(1,n-2)];
     C1 = C1(:)';
     C2 = [pi*ones(1,n),C1,pi*ones(1,n)];
@@ -229,6 +225,7 @@ for i=tinicial+dt:dt:tfinal
 %         MCa=reshape(Co,m,n)'; 
         surf(MX,MY,MCc); axis([-4 4 -4 4 -1 8]); view(2)
         drawnow;
+        zlim([0 zlims])
         %pause(dt)
         %errorPF(conte)=norm(C2-Ca);
         %conte=conte+1;

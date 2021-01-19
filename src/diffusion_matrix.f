@@ -27,7 +27,7 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !
       USE CSC_STORAGE
-      USE DECLARATIONS_NUMERICAL, ONLY:NX,DEBUG 
+      USE DECLARATIONS_NUMERICAL, ONLY:NX,NY,DEBUG 
       IMPLICIT NONE
 !
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -44,19 +44,19 @@
 ! AUXILIAR MATRICES
 !
       !MATRIX OF VALUES FOR K11
-      DOUBLE PRECISION, DIMENSION(NX-2,1) :: HO
+      DOUBLE PRECISION, DIMENSION(NY-2,1) :: HO
       !DIAGONAL INDICES FOR K11 AND K22 (=0, MAIN DIAGONAL)
       INTEGER, DIMENSION(1) :: DPO
       !MATRIX K11
       TYPE(CSC_OBJ) :: K11
       !MATRIX OF VALUES FOR K12
-      DOUBLE PRECISION, DIMENSION(NX-2,3) :: H1
+      DOUBLE PRECISION, DIMENSION(NX-2,3) ::  H1
       !DIAGONALS INDICES FOR K12
       INTEGER, DIMENSION(3) :: D1
       !MATRIX K12
       TYPE(CSC_OBJ) :: K12
       !MATRIX OF VALUES FOR K21
-      DOUBLE PRECISION, DIMENSION(NX-3,2) :: H2
+      DOUBLE PRECISION, DIMENSION(NY-3,2) :: H2
       !DIAGONAL INDICES FOR K21
       INTEGER, DIMENSION(2) :: D2
       !MATRIX K21
@@ -93,7 +93,7 @@
       ! COMPUTING K11 MATRIX
       HO = 1D0
       DPO = 0
-      CALL CSC_DIAG(1,NX-2,HO,DPO,K11,'K11   ')
+      CALL CSC_DIAG(1,NY-2,HO,DPO,K11,'K11   ')
       ! ! !WRITE(*,*) 'K11V ', K11%V
       ! ! !WRITE(*,*) 'K11R ', K11%R
       ! ! !WRITE(*,*) 'K11C ', K11%C     
@@ -118,7 +118,7 @@
       H2 = 1.0D0
       D2 = (/-1, 1/)
       ! CSC_DIAG (H2,D2)
-      CALL CSC_DIAG(2,NX-3,H2,D2,K21,'K21   ')
+      CALL CSC_DIAG(2,NY-3,H2,D2,K21,'K21   ')
       ! ! !WRITE(*,*) 'K21V ', K21%V
       ! ! !WRITE(*,*) 'K21R ', K21%R
       ! ! !WRITE(*,*) 'K21C ', K21%C     

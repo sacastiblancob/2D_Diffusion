@@ -32,7 +32,7 @@ m =101;
 
 %Space differentials
 dx = (xmax-xmin)/(n-1);
-dy = (ymax-ymin)/(n-1);
+dy = (ymax-ymin)/(m-1);
 
 %X and Y vectors
 x=xmin:dx:xmax;
@@ -41,10 +41,10 @@ y=ymin:dy:ymax;
 %X and Y matrices
 X=kron(ones(1,m),x);
 Y1=kron(y,ones(1,n));
-% Y=Y1(n*m:-1:1);
+%Y=Y1(n*m:-1:1);
 Y = Y1;
-MX=reshape(X,m,n)';
-MY=reshape(Y,m,n)';
+MX=reshape(X,n,m)';
+MY=reshape(Y,n,m)';
 
 %Time discretization
 % dt=.025;
@@ -86,11 +86,11 @@ ay=-Sy;
 % diagk = sparse(diag(diag(K)));
 
 % K CSC storage
-[K11v,K11r,K11c] = csc_diag(ones(n-2,1),0);
+[K11v,K11r,K11c] = csc_diag(ones(m-2,1),0);
 h1 = [ax*ones(n-2,1) ap*ones(n-2,1) ax*ones(n-2,1)];
 d1 = [-1 0 1];
 [K12v,K12r,K12c] = csc_diag(h1,d1);
-h2 = [ones(n-3,1) ones(n-3,1)];
+h2 = [ones(m-3,1) ones(m-3,1)];
 d2 = [-1 1];
 [K21v,K21r,K21c] = csc_diag(h2,d2);
 [K22v,K22r,K22c] = csc_diag(ay*ones(n-2,1),0);
@@ -130,7 +130,7 @@ d2 = [-1 1];
 %Initial condition
 Co=analitica(X,Y,tinicial,u,-v,Dx,Dy);
 conte=1;
-zlims = max(Co)
+zlims = max(Co);
 
 %Error vector
 sizet=size(t);
@@ -215,13 +215,13 @@ for i=tinicial+dt:dt:tfinal
     times = times + 1;
     
     CM = reshape(C,n-2,m-2);
-    C1 = [pi*ones(1,n-2);CM;pi*ones(1,n-2)];
+    C1 = [pi*ones(1,m-2);CM;pi*ones(1,m-2)];
     C1 = C1(:)';
     C2 = [pi*ones(1,n),C1,pi*ones(1,n)];
     C2(C2==pi)=Ca(C2==pi);
 
         %MCc=reshape(C,m,n)';
-        MCc = reshape(C2,m,n)';
+        MCc = reshape(C2,n,m)';
 %         MCa=reshape(Co,m,n)'; 
         surf(MX,MY,MCc); axis([-4 4 -4 4 -1 8]); view(2)
         drawnow;
