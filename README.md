@@ -1,8 +1,7 @@
 # 2D_Diffusion
-> Bidimensional Solver of Diffusion Equation with Finite Differences
+> Bidimensional Solver of Diffusion Equation with Finite Differences - FORTRAN
 
-2D_Difussion finite differences solver with CSC storage and solvers for \
-matrices (Thematic) or ADI solver(Developing State)
+2D_Difussion finite differences solver with CSC storage and solvers for matrices (Thematic) or ADI solver(Developing State)
 
 With Fortran - GNU-Fortran compiler (and Matlab originals).
 
@@ -38,7 +37,7 @@ The results will be storaged in the ./res/ file, within the .dat files. You can 
 
 Printed Variables: Tracer (C), Solution Abs Error (ERR)
 
-## Folder Hierarchy
+## Folder Contents
 
 ./bin/ --> Executable file
 
@@ -60,8 +59,10 @@ Printed Variables: Tracer (C), Solution Abs Error (ERR)
 
 ## Meta
 Sergio A. Castiblanco-Ballesteros
+Bogota - Colombia
 sergio.castiblanco@javeriana.edu.co
+sacastiblancob@unal.edu.co
 
-Free Distribution and Open Source (As should be!!)
+> Free Distribution and Open Source (As it should be!!)
 
 
