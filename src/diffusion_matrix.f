@@ -1,8 +1,7 @@
 !                 ***************************
                   SUBROUTINE DIFFUSION_MATRIX
 !                 ***************************
-     & (DX,DY,DT,VX,VY,BOUND,UPBOUND,DOBOUND,RIBOUND,LEBOUND,KM,
-     &    SX,SY)
+     & (DX,DY,DT,VX,VY,KM,SX,SY)
 !
 !***********************************************************************
 ! 2D-DIFFUSION SOLVER SOLVER - FINITE DIFFERENCES
@@ -28,22 +27,17 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !
       USE CSC_STORAGE
-      USE DECLARATIONS_NUMERICAL, ONLY:NX,NY,DEBUG,LU 
+      USE DECLARATIONS_NUMERICAL, ONLY:NX,DEBUG 
       IMPLICIT NONE
 !
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !
       DOUBLE PRECISION, INTENT(IN)                  :: DX,DY,DT,VX,VY
-      INTEGER, DIMENSION((2*NX+2*NY)-4), INTENT(IN) :: BOUND
-      INTEGER, DIMENSION(NX), INTENT(IN)            :: UPBOUND, DOBOUND
-      INTEGER, DIMENSION(NY-2), INTENT(IN)          :: RIBOUND,LEBOUND
       DOUBLE PRECISION, INTENT(INOUT)               :: SX,SY
       TYPE(CSC_OBJ), INTENT(OUT)                    :: KM
 !
 ! IN SUBROUTINE VARIABLES
 !
-      !LOOP INTEGERS
-      INTEGER :: I,J
       !MATRIX COEFFICIENTS
       DOUBLE PRECISION :: AP,AX,AY
 !
@@ -80,10 +74,10 @@
 !
 ! SETTING DIFFUSSION STABILITY PARAMETERS
 !
-      IF(DEBUG) WRITE(LU,*) 'COMPUTING SX AND SY'
+      IF(DEBUG) WRITE(*,*) 'COMPUTING SX AND SY'
       SX = ((DT*VX)/(DX**2))
       SY = ((DT*VY)/(DY**2))
-      IF(DEBUG) WRITE(LU,*) 'END COMPUTING SX AND SY'
+      IF(DEBUG) WRITE(*,*) 'END COMPUTING SX AND SY'
 !
 ! COMPUTING STTIFFNESS DIFFUSION MATRIX
 !
@@ -94,7 +88,7 @@
       AY = -SY
 !
 ! COMPUTING MATRIX BY DIAGONALS AND KRONECKER PRODUCTS
-      IF(DEBUG) WRITE(LU,*) 'K11 MATRIX'
+      IF(DEBUG) WRITE(*,*) 'K11 MATRIX'
       !
       ! COMPUTING K11 MATRIX
       HO = 1D0
@@ -105,7 +99,7 @@
       ! ! !WRITE(*,*) 'K11C ', K11%C     
       !
       ! COMPUTING K12 MATRIX
-      IF(DEBUG) WRITE(LU,*) 'COMPUTING K12'
+      IF(DEBUG) WRITE(*,*) 'COMPUTING K12'
       ! H1
       H1 = 1.0D0
       H1(:,1) = AX*H1(:,1)
@@ -120,7 +114,7 @@
       ! ! !WRITE(*,*) 'K12C ', K12%C     
       !
       ! COMPUTING K21 MATRIX
-      IF(DEBUG) WRITE(LU,*) 'COMPUTING K21'
+      IF(DEBUG) WRITE(*,*) 'COMPUTING K21'
       H2 = 1.0D0
       D2 = (/-1, 1/)
       ! CSC_DIAG (H2,D2)
@@ -130,7 +124,7 @@
       ! ! !WRITE(*,*) 'K21C ', K21%C     
       !
       ! COMPUTING K22 MATRIX
-      IF(DEBUG) WRITE(LU,*) 'COMPUTING K22'
+      IF(DEBUG) WRITE(*,*) 'COMPUTING K22'
       H3 = 1.0D0
       H3 = H3*AY
       ! CSC_DIAG(H3,0)
@@ -163,10 +157,10 @@
       ! ! !WRITE(*,*) 'KNC,KNR,KNZ ', KM%NC,KM%NR,KM%NZ
 ! DISPLAYING COMPUTED SX AND SY
 !
-      WRITE(LU,*) REPEAT('~',72)
-      WRITE(LU,*) 'SX VALUE: ', SX
-      WRITE(LU,*) 'SY VALUE: ', SY
-      WRITE(LU,*) REPEAT('~',72)
+      WRITE(*,*) REPEAT('~',72)
+      WRITE(*,*) 'SX VALUE: ', SX
+      WRITE(*,*) 'SY VALUE: ', SY
+      WRITE(*,*) REPEAT('~',72)
 !
       END SUBROUTINE DIFFUSION_MATRIX
  

@@ -63,8 +63,6 @@
 !  IN SUBROUTINE VARIABLES
 !
       INTEGER :: AJ, BJ, P, AF, BF, IA, IB, J
-      ! LOCAL DEBUG OPTION
-      LOGICAL :: DEBUG = .TRUE.
 !
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !
@@ -98,16 +96,4 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !
       END SUBROUTINE CSC_KRON
-
-
-
-
-
-
-
-
-
-
-
-
 

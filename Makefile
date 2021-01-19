@@ -58,6 +58,10 @@ SRCKRON = $(SRCDIR)/csc_kron.f
 SRCSUMC = $(SRCDIR)/csc_sum.f
 SRCDIFF = $(SRCDIR)/diffusion_matrix.f
 SRCFANA = $(SRCDIR)/analytical.f
+SRCPRHS = $(SRCDIR)/point_rhs.f
+SRCCMMV = $(SRCDIR)/csc_mmatvec.f
+SRCCCGS = $(SRCDIR)/csc_cg.f
+SRCUPDA = $(SRCDIR)/update_and_write.f
 #
 # OBJECT FILES
 #
@@ -74,10 +78,15 @@ OBJKRON = $(OBJDIR)/csc_kron.o
 OBJSUMC = $(OBJDIR)/csc_sum.o
 OBJDIFF = $(OBJDIR)/diffusion_matrix.o
 OBJFANA = $(OBJDIR)/analytical.o
+OBJPRHS = $(OBJDIR)/point_rhs.o
+OBJCMMV = $(OBJDIR)/csc_mmatvec.o
+OBJCCGS = $(OBJDIR)/csc_cg.o
+OBJUPDA = $(OBJDIR)/update_and_write.o
 #
 OBJECTS = $(OBJDCSC) $(OBJCSCS) $(OBJPHYS) $(OBJNUME) $(OBJWRHE) \
 			   	$(OBJPONS) $(OBJALLC) $(OBJDIAG) $(OBJKRON) $(OBJSUMC) \
-				 	$(OBJDIFF) $(OBJFANA) $(OBJMAIN)
+				 	$(OBJDIFF) $(OBJFANA) $(OBJPRHS) $(OBJCMMV) $(OBJCCGS) \
+				 	$(OBJUPDA) $(OBJMAIN)
 #
 #
 # MODULE FILES
@@ -135,6 +144,18 @@ $(OBJDIFF): $(SRCDIFF)
 
 $(OBJFANA): $(SRCFANA)
 	    $(FC) $(CFLAGS) $(SRCFANA) -o $(OBJFANA)
+
+$(OBJPRHS): $(SRCPRHS)
+	    $(FC) $(CFLAGS) $(SRCPRHS) -o $(OBJPRHS)
+
+$(OBJCMMV): $(SRCCMMV)
+	    $(FC) $(CFLAGS) $(SRCCMMV) -o $(OBJCMMV)
+
+$(OBJCCGS): $(SRCCCGS)
+	    $(FC) $(CFLAGS) $(SRCCCGS) -o $(OBJCCGS)
+
+$(OBJUPDA): $(SRCUPDA)
+	    $(FC) $(CFLAGS) $(SRCUPDA) -o $(OBJUPDA)
 
 $(OBJMAIN): $(MODULES) $(SRCMAIN)
 	    $(FC) $(CFLAGS) $(SRCMAIN) -o $(OBJMAIN)

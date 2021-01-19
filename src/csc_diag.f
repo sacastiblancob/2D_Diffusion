@@ -294,10 +294,16 @@
 ! License: GPLv3
 ! Gist: https://gist.github.com/t-nissie/479f0f16966925fa29ea
 !!
+! changed to work with integers entries only (Sergio_Castiblanco)
+!
       recursive subroutine quicksort(a, first, last)
       implicit none
-      double precision  x, t
-      integer a(*), first, last
+      ! original ! double precision  x, t, a(*)
+      ! modified
+      double precision x
+      integer t, a(*)
+      !
+      integer first, last
       integer i, j
 !
       x = a( (first+last) / 2 )
