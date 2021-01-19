@@ -27,8 +27,8 @@ ymin=-4;
 ymax=4;
 
 %Number of nodes in X direction (n) and Y direction(m)
-n=9;
-m =9;
+n=101;
+m =101;
 
 %Space differentials
 dx = (xmax-xmin)/(n-1);
@@ -47,7 +47,8 @@ MX=reshape(X,m,n)';
 MY=reshape(Y,m,n)';
 
 %Time discretization
-dt=.025;
+% dt=.025;
+dt=.0128;
 tinicial=2;
 tfinal=10;
 t=tinicial+dt:dt:tfinal;
@@ -129,6 +130,7 @@ d2 = [-1 1];
 %Initial condition
 Co=analitica(X,Y,tinicial,u,-v,Dx,Dy);
 conte=1;
+zlims = max(Co)
 
 %Error vector
 sizet=size(t);
@@ -206,7 +208,7 @@ for i=tinicial+dt:dt:tfinal
 
     % % CG CSC
     [C,t] = csc_CG(Kv,Kr,Kc,Caux',C,100,tol);
-
+    %t
     % % DPCG CSC
     % [C,t] = csc_DPCG(Kv,Kr,Kc,Caux',C,100,tol);
 
@@ -223,6 +225,7 @@ for i=tinicial+dt:dt:tfinal
 %         MCa=reshape(Co,m,n)'; 
         surf(MX,MY,MCc); axis([-4 4 -4 4 -1 8]); view(2)
         drawnow;
+        zlim([0 zlims])
         %pause(dt)
         %errorPF(conte)=norm(C2-Ca);
         %conte=conte+1;

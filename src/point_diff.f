@@ -171,8 +171,13 @@
 ! SETTING TIME PARAMETERS
 !
       IF(DEBUG) WRITE(*,*) 'COMPUTING DT AND NT'
-      DTL = (0.5*MIN(DX,DY)**2)/MAX(VX,VY)
+!  WRITING CHANGE IN DT IF ANY
+      DTL = (0.25*MIN(DX,DY)**2)/MAX(VX,VY)
       IF(DT.GT.DTL) THEN
+        WRITE(*,*) REPEAT('~',72)
+        WRITE(*,*) 'USER DT: ',DT
+        WRITE(*,*) 'CHANGED DT: ',DTL
+        WRITE(*,*) REPEAT('~',72)
         DT = DTL
       ENDIF
       NT = INT(FLOOR((TF-TO)/DT))

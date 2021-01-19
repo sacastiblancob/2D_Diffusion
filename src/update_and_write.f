@@ -28,7 +28,7 @@
 !| TOL       |-->| SOLVER TOLERANCE                                    |
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !
-      USE DECLARATIONS_NUMERICAL, ONLY:NX,NY,NT
+      USE DECLARATIONS_NUMERICAL, ONLY:NX,NY,NT,DT
       IMPLICIT NONE
 !
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -51,7 +51,7 @@
 ! IN SUBROUTINE VARIABLES
 !
       INTEGER :: I,J,L,K
-      DOUBLE PRECISION :: ERR,C1,C2,C3,C4
+      DOUBLE PRECISION :: ERR,ERR2,C1,C2,C3,C4
       CHARACTER(LEN=80) :: FOUT
       CHARACTER(LEN=9)  :: FMT2
       CHARACTER(LEN=30) :: FSPEC
@@ -67,7 +67,10 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         WRITE(*,*) REPEAT('~',72)
         WRITE(*,*) 'INIT DONE'
-        WRITE(*,*) 'WRITING INTIAL CONDITION'
+        WRITE(*,*) 'WRITING INITIAL CONDITION'
+        WRITE(*,*) 'TIME STEP VALUE: ',DT
+        WRITE(*,*) 'INITIAL TIME: ',T(1)
+        WRITE(*,*) 'FINAL TIME: ',T(SIZE(T))
         WRITE(*,*) REPEAT('~',72)
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         FMT2 = '(i4.4,a4)'
@@ -79,7 +82,7 @@
         OPEN(WTI,FILE=FOUT)
 !
 !  HEADER
-        WRITE(WTI,*) 'TITLE = "DIFFUSION 2D - FD'
+        WRITE(WTI,*) 'TITLE = "DIFFUSION 2D - FD"'
         WRITE(WTI,*) 'VARIABLES = "X" "Y" "C" "ERR"'
         WRITE(WTI,*) ' ZONE F=POINT, I=',NX,', J= ',NY
 !
@@ -117,9 +120,10 @@
 !  COMPUTING CR
 !
       DO J = 1,NX*NY
-        CERR = ABS(CA(J) - CO(J))
+        CERR(J) = ABS(CA(J) - CO(J))
       ENDDO
       ERR = NORM2(CERR)
+      ERR2 = MAXVAL(CERR)
 !
 !  WRITING IF IS TIME TO WRITE
 !
@@ -130,10 +134,12 @@
         WRITE(*,*) REPEAT('~',72)
         WRITE(*,*) 'TIME: ',T(TI),'(s)'
         WRITE(*,*) 'TIME STEP: ',TI,' OF ',SIZE(T)
-        WRITE(*,*) 'LAST SOLVER TOL: ', TOL
+        WRITE(*,*) 'TIME STEP VALUE: ',DT
+        WRITE(*,*) 'LAST SOLVER TOL FOR THE RESIDUAL: ', TOL
         WRITE(*,*) 'LAST SOLVER NUMBER OF ITERATIONS: ',NITER
         WRITE(*,*) 'ERROR (NORM2) WITH ANALYTICAL: ',ERR
-        WRITE(*,*) 'WRITING FILE NUMBER: ', WTI
+        WRITE(*,*) 'ERROR (INF) WITH ANALYTICAL: ',ERR2
+        WRITE(*,*) 'WRITING FILE NUMBER: ', INT(WTI/10)
         WRITE(*,*) REPEAT('~',72)
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -149,7 +155,7 @@
         OPEN(WTI,FILE=FOUT)
 !
 !  HEADER
-        WRITE(WTI,*) 'TITLE = "DIFFUSION 2D - FD'
+        WRITE(WTI,*) 'TITLE = "DIFFUSION 2D - FD"'
         WRITE(WTI,*) 'VARIABLES = "X" "Y" "C" "ERR"'
         WRITE(WTI,*) ' ZONE F=POINT, I=',NX,', J= ',NY
 !

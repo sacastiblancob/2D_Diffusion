@@ -18,7 +18,7 @@
 
 
 function C=analitica(x,y,t,u,v,Dx,Dy)
-    M=1;
+    M=10;
     L=1;
     x0=0;
     y0=0;
