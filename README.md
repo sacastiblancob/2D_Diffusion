@@ -5,6 +5,8 @@
 
 With Fortran - GNU-Fortran compiler (and Matlab originals).
 
+Most relevant things in this solver are the Compressed Sparse Column (CSC) tools developed.
+
 ## Installation
 
 OS X & GNU-Linux:
