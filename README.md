@@ -59,9 +59,12 @@ Printed Variables: Tracer (C), Solution Abs Error (ERR)
 
 ## Meta
 Sergio A. Castiblanco-Ballesteros
+
 Bogota - Colombia
-sergio.castiblanco@javeriana.edu.co
-sacastiblancob@unal.edu.co
+
+Mail 1: sacastiblancob@unal.edu.co
+
+Mail 2: sergio.castiblanco@javeriana.edu.co
 
 > Free Distribution and Open Source (As it should be!!)
 
