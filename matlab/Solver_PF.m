@@ -74,9 +74,9 @@ ax=-Sx;
 ay=-Sy;
 
 % % % K full storage (not even in the best use of matlab sparse)
-% K11=diag(ones(n-2,1));
+% K11=diag(ones(m-2,1));
 % K12=ax*diag(ones(n-3,1),1)+ax*diag(ones(n-3,1),-1)+ap*diag(ones(n-2,1));
-% K21=diag(ones(n-3,1),1)+diag(ones(n-3,1),-1);
+% K21=diag(ones(m-3,1),1)+diag(ones(m-3,1),-1);
 % K22=ay*diag(ones(n-2,1));
 % K=kron(K11,K12)+kron(K21,K22);
 % dimen(iv) = length(K);
